@@ -22,22 +22,33 @@ const select = new SlimSelect({
 });
 select.disable();
 
-/**
- * Get all breeds and populate select options
- */
-const breeds = await fetchBreeds().catch(error);
+drawOptions();
 
-const options = Object.keys(breeds).map(breed => {
-  return { text: breed, value: breeds[breed] };
-});
-select.setData(options);
-select.enable();
-showLoader(false);
+/**
+ * Draw options in select
+ */
+async function drawOptions() {
+  const breeds = await fetchBreeds().catch(error);
+  const options = [
+    { text: 'Chose cat breed', value: 'empty' },
+    ...Object.keys(breeds).map(breed => {
+      return { text: breed, value: breeds[breed] };
+    }),
+  ];
+  select.setData(options);
+  select.enable();
+  showLoader(false);
+}
 
 /**
  * Add event listener to select
  */
 selectRef.addEventListener('change', async e => {
+  if (e.target.value === 'empty') {
+    catInfoRef.innerHTML = '';
+    return;
+  }
+
   showLoader();
   await fetchCatByBreed(e.target.value)
     .then(makeCatsMarkup)
