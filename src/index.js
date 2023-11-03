@@ -28,7 +28,13 @@ drawOptions();
  * Draw options in select
  */
 async function drawOptions() {
-  const breeds = await fetchBreeds().catch(error);
+  const breeds = await fetchBreeds()
+    .then(data => {
+      const breeds = {};
+      data.map(breed => (breeds[breed.name] = breed.id));
+      return breeds;
+    })
+    .catch(error);
   const options = [
     { text: 'Chose cat breed', value: 'empty' },
     ...Object.keys(breeds).map(breed => {
@@ -73,6 +79,7 @@ function error(err) {
     icon: null,
     timeout: 1500,
   });
+  catInfoRef.innerHTML = '';
 }
 
 /**
